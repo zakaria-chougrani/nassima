@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4" style="padding: 20px;">
+                <div class="card-header pb-0">
+                    <h3>Formulaire:</h3>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <form method="POST" id="myForm">
+                        {% csrf_token %}
+                        <div class="row g-3 pt-4 align-items-center">
+                            <div class="col-auto">
+                                <label for="nomComplet" class="form-label">Nom Complet de bénéficiaire:</label>
+                                <input type="text" name="nomComplet" id="nomComplet" class="form-control" required>
+                            </div>
+                            <div class="col-auto">
+                                <label for="cnie" class="form-label">CNIE:</label>
+                                <input type="text" name="cnie" id="cnie" class="form-control" required>
+                            </div>
+                            <div class="col-auto">
+                                <label for="etatFamilial" class="form-label">Etat familial:</label>
+                                <select class="form-select" id="etatFamilial" name="etatFamilial"
+                                        aria-label="Default select example">
+                                    <option value="veuve" selected>veuve</option>
+                                    <option value="divorcée">divorcée</option>
+                                    <option value="âgée">âgée</option>
+                                    <option value="âgée">p.à besoin spécifique</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <label for="tailleMenage" class="form-label">Taille Ménage:</label>
+                                <input type="number" name="tailleMenage" id="tailleMenage" class="form-control"
+                                       value="0" min="0" pattern="0[0-9]*" required>
+                            </div>
+                            <div class="col-auto">
+                                <label for="nbrEnfants" class="form-label">Nombre Enfants:</label>
+                                <input type="number" name="nbrEnfants" id="nbrEnfants" class="form-control" value="0"
+                                       min="0" pattern="0[0-9]*" required>
+                            </div>
+                        </div>
+                        <div id="childrenContainer">
+                            <!-- Child cards will be added here dynamically -->
+                        </div>
+                        <div class="row pt-4">
+                            <div class="col-auto">
+                                <label for="habitat" class="form-label">Habitat:</label>
+                                <input type="text" name="habitat" id="habitat" class="form-control" required>
+
+                            </div>
+                            <div class="col-auto">
+                                <label for="adresse" class="form-label">Adresse:</label>
+                                <input type="text" name="adresse" id="adresse" class="form-control" required>
+
+                            </div>
+                            <div class="col-auto">
+                                <label for="tel" class="form-label">Tél:</label>
+                                <input type="text" name="tel" id="tel" class="form-control" pattern="0[0-9]*" required>
+                            </div>
+                        </div>
+
+                        <div class="row pt-4">
+                            <div class="col-auto">
+                                <input type="submit" value="Enregistrer" class="btn btn-success">
+                            </div>
+                            <div class="col-auto">
+                                <input type="reset" value="Annuler" class="btn btn-light">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get a reference to the form element
+        const form = document.getElementById('myForm');
+
+        // Add an event listener to the form to handle submission
+        form.addEventListener('submit', handleSubmit);
+
+        // Add an event listener to the "numChildren" input to handle changes
+        const numChildrenInput = document.getElementById('nbrEnfants');
+        numChildrenInput.addEventListener('change', handleNumChildrenChange);
+
+        // Function to handle form submission
+        function handleSubmit(event) {
+            event.preventDefault(); // prevent the default form submission
+
+            // Create a new FormData object to collect the form data
+            const formData = new FormData(event.target);
+            // Convert the FormData object to a plain object
+            const data = Object.fromEntries(formData.entries());
+            // Create an array for the children
+            const children = [];
+
+            // Loop through the number of children and add their data to the children array
+            for (let i = 1; i <= parseInt(data.nbrEnfants); i++) {
+                const child = {
+                    genre: document.getElementById(`genre-${i}`).value,
+                    age: document.getElementById(`age-${i}`).value,
+                    etablissement: document.getElementById(`etablissement-${i}`).value,
+                    nScol: document.getElementById(`nScol-${i}`).value,
+                };
+                children.push(child);
+            }
+            var formulaire = {
+                nomComplet: data.nomComplet,
+                cnie: data.cnie.toUpperCase(),
+                etatFamilial: data.etatFamilial,
+                tailleMenage: data.tailleMenage,
+                habitat: data.habitat,
+                adresse: data.adresse,
+                tel: data.tel,
+                enfants: children
+            };
+            console.log(formulaire);
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', '/');
+            // Set the CSRF token value in the XHR request headers
+            var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            xhr.setRequestHeader('X-CSRFToken', csrftoken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(function () {
+                        const childrenContainer = document.getElementById('childrenContainer');
+                        // Clear any existing child cards
+                        childrenContainer.innerHTML = '';
+                        // Reset the form
+                        form.reset();
+                    });
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Request failed.  Returned status of ' + xhr.status
+                    })
+                }
+            };
+            xhr.send(JSON.stringify(formulaire));
+
+        }
+
+        // Function to handle changes to the "numChildren" input
+        function handleNumChildrenChange(event) {
+            const numChildren = parseInt(event.target.value);
+            const childrenContainer = document.getElementById('childrenContainer');
+
+            // Clear any existing child cards
+            childrenContainer.innerHTML = '';
+
+            // Add child cards for the new number of children
+            for (let i = 1; i <= numChildren; i++) {
+                const childCard = `
+              <div class="card m-5">
+                <div class="card-body">
+                    <h5 class="card-title">Enfant ${i}:</h5>
+                    <div class="row">
+                        <div class="col-auto">
+                            <label for="genre-${i}" class="form-label">Genre:</label>
+                            <select class="form-select pe-5" id="genre-${i}" required>
+                                <option value="f" selected>Fille</option>
+                                <option value="g">Garçon</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label for="age-${i}" class="form-label">Age:</label>
+                            <input type="number" id="age-${i}" class="form-control" value="0" min="0" pattern="0[0-9]*" required>
+                        </div>
+                        <div class="col-auto">
+                            <label for="nScol-${i}" class="form-label">Niveau Scolaire:</label>
+                            <select class="form-select pe-5" id="nScol-${i}" required>
+                                <option value="primaire-0" selected>Primaire-0</option>
+                                <option value="primaire-1">Primaire-1</option>
+                                <option value="primaire-2">Primaire-2</option>
+                                <option value="primaire-3">Primaire-3</option>
+                                <option value="primaire-4">Primaire-4</option>
+                                <option value="primaire-5">Primaire-5</option>
+                                <option value="primaire-6">Primaire-6</option>
+                                <option value="college-1">collége-1</option>
+                                <option value="college-2">collége-2</option>
+                                <option value="college-3">collége-3</option>
+                                <option value="lycee-1">Lycée-1</option>
+                                <option value="lycee-2">Lycée-2</option>
+                                <option value="lycee-3">Lycée-3</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label for="etablissement-${i}" class="form-label">Etablissement:</label>
+                            <input type="text" id="etablissement-${i}" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            `;
+                childrenContainer.innerHTML += childCard;
+            }
+        }
+    </script>
+{% endblock %}

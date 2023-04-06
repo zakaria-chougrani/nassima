@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4" style="padding: 20px;">
+                    <div class="card-header pb-0">
+                        <h6>Tableau des Enfants:</h6>
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <label>
+                                Age De:
+                                <input type="number" name="ageDebut" class="form-control" min="0">
+                            </label>
+                            <label>
+                                à:
+                                <input type="number" name="ageFin" class="form-control" min="0">
+                            </label>
+                            <input type="submit" value="recherche" class="btn btn-primary">
+                            <div class="table-responsive p-0">
+                                <table id="myTable" class="table align-items-center mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            nom Complet de mére
+                                        </th>
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            tel de mére
+                                        </th>
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            genre d'enfant
+                                        </th>
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Age d'enfant
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in data_table %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">{{ item.parent__nomComplet|title }}</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <p class="text-xs font-weight-bold mb-0">{{ item.parent__tel }}</p>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <span class="text-secondary text-xs font-weight-bold">{% if item.genre == "f" %} Fille {% else %} Garçon {% endif %}</span>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <span class="badge badge-sm {% if item.age < 10 %}bg-gradient-success{% else %}bg-gradient-danger{% endif %}">{{ item.age }} ans</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let table = new DataTable('#myTable');
+    </script>
+{% endblock %}
