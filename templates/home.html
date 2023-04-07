@@ -46,7 +46,7 @@
                         </div>
                         <div class="row pt-4">
                             <div class="col-auto">
-                                <label for="habitat" class="form-label">Habitat:</label>
+                                <label for="habitat" class="form-label">Type Habitat:</label>
                                 <input type="text" name="habitat" id="habitat" class="form-control" required>
 
                             </div>
@@ -171,8 +171,8 @@
                         <div class="col-auto">
                             <label for="genre-${i}" class="form-label">Genre:</label>
                             <select class="form-select pe-5" id="genre-${i}" required>
-                                <option value="f" selected>Fille</option>
-                                <option value="g">Garçon</option>
+                                <option value="fille" selected>Fille</option>
+                                <option value="garçon">Garçon</option>
                             </select>
                         </div>
                         <div class="col-auto">
@@ -182,7 +182,8 @@
                         <div class="col-auto">
                             <label for="nScol-${i}" class="form-label">Niveau Scolaire:</label>
                             <select class="form-select pe-5" id="nScol-${i}" required>
-                                <option value="primaire-0" selected>Primaire-0</option>
+                                <option value="préscolaire" selected>Préscolaire</option>
+                                <option value="garderie">Garderie</option>
                                 <option value="primaire-1">Primaire-1</option>
                                 <option value="primaire-2">Primaire-2</option>
                                 <option value="primaire-3">Primaire-3</option>
@@ -199,8 +200,8 @@
                             </select>
                         </div>
                         <div class="col-auto">
-                            <label for="etablissement-${i}" class="form-label">Etablissement:</label>
-                            <input type="text" id="etablissement-${i}" class="form-control" required>
+                            <label for="etablissement-${i}" class="form-label">Etablissement:(* non requis)</label>
+                            <input type="text" id="etablissement-${i}" class="form-control">
                         </div>
                     </div>
                 </div>

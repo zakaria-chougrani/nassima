@@ -21,12 +21,18 @@
                                 <input type="number" name="ageFin" class="form-control" min="0">
                             </label>
                             <input type="submit" value="recherche" class="btn btn-primary">
+                            <a href="{% url 'export_csv' %}" class="btn btn-warning"> Exporter les données au
+                                format CSV </a>
+
                             <div class="table-responsive p-0">
                                 <table id="myTable" class="table align-items-center mb-0">
                                     <thead>
                                     <tr>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             nom Complet de mére
+                                        </th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            cnie de mére
                                         </th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                             tel de mére
@@ -49,11 +55,19 @@
                                                     </div>
                                                 </div>
                                             </td>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">{{ item.parent__cnie }}</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
                                             <td class="align-middle text-center">
                                                 <p class="text-xs font-weight-bold mb-0">{{ item.parent__tel }}</p>
                                             </td>
                                             <td class="align-middle text-center">
-                                                <span class="text-secondary text-xs font-weight-bold">{% if item.genre == "f" %} Fille {% else %} Garçon {% endif %}</span>
+                                                <span class="text-secondary text-xs font-weight-bold">{% if item.genre == "fille" %}
+                                                    Fille {% else %} Garçon {% endif %}</span>
                                             </td>
                                             <td class="align-middle text-center">
                                                 <span class="badge badge-sm {% if item.age < 10 %}bg-gradient-success{% else %}bg-gradient-danger{% endif %}">{{ item.age }} ans</span>
@@ -71,6 +85,8 @@
     </div>
 
     <script>
-        let table = new DataTable('#myTable');
+        $('#myTable').DataTable({
+            responsive: true
+        });
     </script>
 {% endblock %}

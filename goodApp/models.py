@@ -17,8 +17,8 @@ class Parent(models.Model):
 
 class Enfant(models.Model):
     GENDER_CHOICES = (
-        ('g', 'garçon'),
-        ('f', 'fille'),
+        ('garçon', 'garçon'),
+        ('fille', 'fille'),
     )
     parent = models.ForeignKey(Parent, on_delete=models.CASCADE, related_name='enfants')
 
